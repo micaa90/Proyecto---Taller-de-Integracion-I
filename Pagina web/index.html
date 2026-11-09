@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minimercado Jorge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif&display=swap">
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+<div class="acceso" id="acceso">
+  <div class="panel-acceso">
+    <div class="top">
+      <div class="logo">J</div>
+      <div><b>Minimercado Jorge</b><span>Sistema de gestión</span></div>
+    </div>
+    <div class="mid">
+      <label>Perfil de acceso</label>
+      <div class="usuarios">
+        <button type="button" class="usuario" id="uAdmin" aria-pressed="true">
+          <b>Jorge Gregoris</b><span>Administrador / Dueño<br>Acceso completo</span></button>
+        <button type="button" class="usuario" id="uEmpleado" aria-pressed="false">
+          <b>Hijo / Cajero</b><span>Empleado<br>Solo ventas y cobros</span></button>
+      </div>
+      <div class="campo"><label for="clave">Contraseña</label>
+        <input type="password" id="clave" placeholder="Ingresá tu contraseña" autocomplete="off"></div>
+      <div id="errorAcceso"></div>
+      <button type="button" class="btn" id="btnIngresar" style="width:100%; margin-top:4px;">Iniciar sesión</button>
+      <div style="text-align:center; margin-top:14px;">
+        <button type="button" class="enlace" id="btnCambiarClave">Modificar contraseña</button>
+      </div>
+      <p class="pie-nota">Prototipo académico — Taller de Integración I.<br>Contraseña de demostración para ambos perfiles: <b>1234</b></p>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="app" hidden>
+
+  <aside class="barra">
+    <div class="marca">
+      <div class="logo">J</div>
+      <div class="txt"><b>Minimercado Jorge</b><span>Sistema de gestión</span></div>
+    </div>
+    <nav class="nav" id="nav">
+      <button type="button" data-vista="panel" aria-current="true">Panel del día</button>
+      <div class="sep">Operación diaria</div>
+      <button type="button" data-vista="mostrador">Venta en mostrador</button>
+      <button type="button" data-vista="institucionales">Pedidos institucionales</button>
+      <button type="button" data-vista="caja">Caja</button>
+      <div class="sep">Abastecimiento</div>
+      <button type="button" data-vista="inventario">Inventario</button>
+      <button type="button" data-vista="proveedores" data-admin="1">Proveedores y boletas</button>
+      <div class="sep">Análisis</div>
+      <button type="button" data-vista="reportes" data-admin="1">Reportes</button>
+    </nav>
+    <div class="pie">27 de Abril 980 · Córdoba<br>Carnicería · Almacén · Limpieza</div>
+  </aside>
+
+  <main class="area">
+    <header class="cabecera">
+      <div>
+        <h1 id="tituloVista">Panel del día</h1>
+        <div class="sub" id="subVista">Resumen de la jornada y avisos que requieren atención</div>
+      </div>
+      <div class="der">
+        <div class="perfil" role="group" aria-label="Perfil activo">
+          <button type="button" id="pfAdmin" aria-pressed="true">Administrador</button>
+          <button type="button" id="pfEmpleado" aria-pressed="false">Empleado</button>
+        </div>
+        <button type="button" class="btn sec chico" id="btnSalir">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <div class="contenido">
+
+      <!-- ============ PANEL ============ -->
+      <section class="vista" id="v-panel">
+        <div class="rejilla cols-4" id="cifras" style="margin-bottom:16px;"></div>
+        <div class="rejilla panel-rejilla">
+          <div class="tarjeta">
+            <h2>Productos próximos a vencer <span class="nota" id="nVence"></span></h2>
+            <div class="tabla-env"><table><thead><tr><th>Producto</th><th class="num">Stock</th><th class="num">Vence</th><th>Estado</th></tr></thead><tbody id="tbVence"></tbody></table></div>
+          </div>
+          <div class="tarjeta">
+            <h2>Etiquetas de góndola por cambiar <span class="nota" id="nEtiq"></span></h2>
+            <div id="boxEtiq"></div>
+          </div>
+          <div class="tarjeta">
+            <h2>Stock por debajo del mínimo <span class="nota" id="nStock"></span></h2>
+            <div class="tabla-env"><table><thead><tr><th>Producto</th><th>Proveedor</th><th class="num">Stock</th><th class="num">Mínimo</th></tr></thead><tbody id="tbStock"></tbody></table></div>
+          </div>
+          <div class="tarjeta">
+            <h2>Demanda insatisfecha <span class="nota">productos que pidieron y no había</span></h2>
+            <div id="boxDemanda"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MOSTRADOR ============ -->
+      <section class="vista" id="v-mostrador" hidden>
+        <div class="pos">
+          <div>
+            <div class="tarjeta" style="margin-bottom:16px;">
+              <h2>Artículos de la venta</h2>
+              <div class="cuerpo">
+                <div class="buscador">
+                  <input type="text" id="busca" placeholder="Escaneá el código de barras o escribí el nombre" autocomplete="off">
+                  <button type="button" class="btn sec" id="btnDemanda">No hay stock</button>
+                </div>
+                <div class="sugerencias" id="sugerencias"></div>
+              </div>
+              <div class="tabla-env"><table><thead><tr><th>Producto</th><th class="num">Cant.</th><th class="num">Unitario</th><th class="num">Subtotal</th><th></th></tr></thead><tbody id="tbCarrito"></tbody></table></div>
+              <div class="carrito-tot"><span>Total de la venta</span><b id="totalVenta">$ 0</b></div>
+            </div>
+          </div>
+          <div>
+            <div class="tarjeta" style="margin-bottom:16px;">
+              <h2>Cobro <span class="nota">se puede dividir en varios medios</span></h2>
+              <div class="cuerpo">
+                <div id="pagos"></div>
+                <button type="button" class="btn sec chico" id="btnAddPago">Agregar otro medio de pago</button>
+                <div class="restante" id="restante"></div>
+                <div class="campo">
+                  <label for="comprobante">Comprobante a emitir</label>
+                  <select id="comprobante">
+                    <option value="B">Ticket fiscal B — consumidor final</option>
+                    <option value="A">Factura A — responsable inscripto</option>
+                  </select>
+                </div>
+                <div class="aviso ne" style="margin-bottom:12px;">No se habilita cuenta corriente en mostrador: el cobro diferido es solo para clientes institucionales.</div>
+                <div class="acciones">
+                  <button type="button" class="btn" id="btnCobrar">Cobrar y emitir comprobante</button>
+                  <button type="button" class="btn sec" id="btnCancelarVenta">Cancelar venta</button>
+                </div>
+                <div style="margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);">
+                  <button type="button" class="enlace" id="btnFallaCobro">Simular que el cobro es rechazado</button>
+                </div>
+              </div>
+            </div>
+            <div class="tarjeta" id="cardTicket" hidden>
+              <h2>Último comprobante</h2>
+              <div class="cuerpo"><div class="ticket" id="ticket"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ INSTITUCIONALES ============ -->
+      <section class="vista" id="v-institucionales" hidden>
+        <div class="rejilla cols-2">
+          <div class="tarjeta">
+            <h2>Pedidos en borrador <span class="nota">no descuentan stock</span></h2>
+            <div id="boxBorradores"></div>
+            <div class="cuerpo" style="border-top:1px solid var(--line);">
+              <button type="button" class="btn sec chico" id="btnNuevoPedido">Crear pedido borrador</button>
+            </div>
+          </div>
+          <div class="tarjeta">
+            <h2>Cuentas corrientes</h2>
+            <div class="tabla-env"><table><thead><tr><th>Institución</th><th class="num">Saldo deudor</th><th></th></tr></thead><tbody id="tbCtaCte"></tbody></table></div>
+            <div class="cuerpo" style="border-top:1px solid var(--line);">
+              <div class="aviso ne" style="margin-bottom:11px;">La deuda se cancela siempre por el monto total exacto. El sistema no acepta pagos parciales ni entregas a cuenta.</div>
+              <button type="button" class="btn sec chico" id="btnNuevaInst" data-admin="1">Registrar institución</button>
+            </div>
+          </div>
+        </div>
+        <div class="tarjeta" style="margin-top:16px;">
+          <h2>Pedidos entregados <span class="nota">ya descontaron stock y generaron deuda</span></h2>
+          <div class="tabla-env"><table><thead><tr><th>Pedido</th><th>Institución</th><th>Fecha</th><th class="num">Ítems</th><th class="num">Total</th></tr></thead><tbody id="tbEntregados"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- ============ CAJA ============ -->
+      <section class="vista" id="v-caja" hidden>
+        <div class="rejilla cols-2">
+          <div class="tarjeta">
+            <h2>Movimientos del día</h2>
+            <div class="tabla-env"><table><thead><tr><th>Hora</th><th>Concepto</th><th>Medio</th><th class="num">Monto</th></tr></thead><tbody id="tbCaja"></tbody></table></div>
+          </div>
+          <div>
+            <div class="tarjeta" style="margin-bottom:16px;">
+              <h2>Registrar egreso de caja</h2>
+              <div class="cuerpo">
+                <div class="campo"><label for="egProv">Pago en efectivo a proveedor</label>
+                  <select id="egProv"></select></div>
+                <div class="campo"><label for="egMonto">Monto</label>
+                  <input type="number" id="egMonto" min="0" step="100" placeholder="0"></div>
+                <button type="button" class="btn" id="btnEgreso">Registrar egreso</button>
+              </div>
+            </div>
+            <div class="tarjeta">
+              <h2>Cierre de caja</h2>
+              <div class="cuerpo">
+                <div id="resumenCaja"></div>
+                <div class="campo" style="margin-top:12px;"><label for="efectivoFisico">Efectivo físico contado</label>
+                  <input type="number" id="efectivoFisico" min="0" step="100" placeholder="0"></div>
+                <button type="button" class="btn" id="btnCierre">Calcular cierre</button>
+                <div id="salidaCierre"></div>
+                <div class="acciones" id="confirmaCierre" hidden>
+                  <button type="button" class="btn" id="btnConfirmarCierre">Confirmar cierre de caja</button>
+                  <button type="button" class="btn sec" id="btnNoConfirmarCierre">No confirmar</button>
+                </div>
+                <div id="reporteCierre"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ INVENTARIO ============ -->
+      <section class="vista" id="v-inventario" hidden>
+        <div class="tarjeta" style="margin-bottom:16px;">
+          <h2>Catálogo de productos <span class="nota" id="notaInv"></span></h2>
+          <div class="cuerpo" style="border-bottom:1px solid var(--line); display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+            <div style="flex:1; min-width:180px;"><label for="filtroInv">Buscar</label><input type="text" id="filtroInv" placeholder="Nombre, marca o código"></div>
+            <div style="min-width:150px;"><label for="filtroRubro">Rubro</label><select id="filtroRubro"><option value="">Todos</option><option>Almacén</option><option>Carnicería</option><option>Limpieza</option><option>Bebidas</option></select></div>
+            <button type="button" class="btn" id="btnNuevoProd" data-admin="1">Registrar producto</button>
+          </div>
+          <div class="tabla-env"><table><thead><tr><th>Código</th><th>Producto</th><th>Rubro</th><th class="num">Stock</th><th class="num">Costo</th><th class="num">Margen</th><th class="num">Precio</th><th>Vence</th><th></th></tr></thead><tbody id="tbInv"></tbody></table></div>
+        </div>
+        <div class="tarjeta" id="cardMediaRes" data-admin="1">
+          <h2>Recepción de media res <span class="nota">la merma define el costo real de cada corte</span></h2>
+          <div class="cuerpo">
+            <div class="fila">
+              <div><label for="mrPeso">Peso de la media res (kg)</label><input type="number" id="mrPeso" value="95" min="1" step="0.5"></div>
+              <div><label for="mrCosto">Costo total pagado</label><input type="number" id="mrCosto" value="494000" min="0" step="1000"></div>
+              <div><label for="mrMerma">Merma: grasa y hueso (kg)</label><input type="number" id="mrMerma" value="21" min="0" step="0.5"></div>
+            </div>
+            <button type="button" class="btn" id="btnMediaRes" style="margin-top:4px;">Calcular costo por kilo útil</button>
+            <div id="salidaMediaRes"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROVEEDORES ============ -->
+      <section class="vista" id="v-proveedores" hidden>
+        <div class="rejilla cols-2">
+          <div class="tarjeta">
+            <h2>Proveedores <span class="nota">un proveedor fijo por producto</span></h2>
+            <div class="tabla-env"><table><thead><tr><th>Proveedor</th><th>Rubro</th><th class="num">Productos</th><th>Contacto</th><th></th></tr></thead><tbody id="tbProv"></tbody></table></div>
+            <div class="cuerpo" style="border-top:1px solid var(--line);">
+              <button type="button" class="btn sec chico" id="btnNuevoProv">Registrar proveedor</button>
+            </div>
+          </div>
+          <div class="tarjeta">
+            <h2>Sugerencia de reposición <span class="nota">según ventas y stock</span></h2>
+            <div id="boxReposicion"></div>
+          </div>
+        </div>
+        <div class="tarjeta" style="margin-top:16px;">
+          <h2>Registrar boleta de proveedor <span class="nota">actualiza stock y recalcula el precio de venta</span></h2>
+          <div class="cuerpo">
+            <div class="fila" style="margin-bottom:12px;">
+              <div><label for="blProv">Proveedor</label><select id="blProv"></select></div>
+              <div><label for="blNro">N.º de comprobante</label><input type="text" id="blNro" value="0001-00042318"></div>
+              <div><label for="blFecha">Fecha</label><input type="date" id="blFecha"></div>
+            </div>
+            <div class="tabla-env"><table><thead><tr><th>Producto</th><th class="num">Cantidad</th><th class="num">Costo anterior</th><th class="num">Costo nuevo</th></tr></thead><tbody id="tbBoleta"></tbody></table></div>
+            <div class="acciones" style="margin-top:14px;">
+              <button type="button" class="btn" id="btnConfirmarBoleta">Confirmar boleta</button>
+              <button type="button" class="btn sec" id="btnCancelarBoleta">Cancelar carga</button>
+              <button type="button" class="btn sec" id="btnDevolucion">Registrar devolución</button>
+            </div>
+            <div id="salidaBoleta"></div>
+          </div>
+        </div>
+
+        <div class="tarjeta" style="margin-top:16px;">
+          <h2>Boletas registradas <span class="nota">una boleta pendiente se salda o se anula</span></h2>
+          <div class="tabla-env"><table><thead><tr><th>Comprobante</th><th>Proveedor</th><th class="num">Fecha</th><th class="num">Total</th><th>Estado</th><th></th></tr></thead><tbody id="tbBoletas"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- ============ REPORTES ============ -->
+      <section class="vista" id="v-reportes" hidden>
+        <div class="rejilla cols-2">
+          <div class="tarjeta">
+            <h2>Ranking de productos más vendidos</h2>
+            <div id="boxRanking"></div>
+          </div>
+          <div class="tarjeta">
+            <h2>Rentabilidad por rubro <span class="nota">margen promedio ponderado</span></h2>
+            <div id="boxRubros"></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div class="velo" id="velo" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+    <h3 id="modalTitulo"></h3>
+    <div class="mc" id="modalCuerpo"></div>
+    <div class="mp" id="modalPie"></div>
+  </div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
